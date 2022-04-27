@@ -39,42 +39,34 @@ contract Academy {
         principal = msg.sender;
     }
 
-    function addTeacher(string calldata name, address wallet) 
-        public onlyPrincipal() returns(bool) {
-            if(_isUsedWallet(wallet)) {
-                revert("this wallet is already in use");
-            }
+    function _addTeacher(string calldata name, address wallet) 
+        internal onlyPrincipal() isFreshWallet(wallet) returns(bool) {
             teachers[wallet] = Teacher(name, wallet);
             emit TeacherAdded(name, wallet);
             return true;
     }
 
-    function addStudent(string calldata name, address wallet)
-        public teacherOrPrincipal() returns(bool) {
-            if(_isUsedWallet(wallet)) {
-                revert("this wallet is already in use");
-            }
+    function _addStudent(string calldata name, address wallet)
+        internal teacherOrPrincipal() isFreshWallet(wallet) returns(bool) {
             students[wallet] = Student(name, wallet);
             emit StudentAdded(name, wallet);
             return true;
     }
 
-    function createClass(string calldata name, string[] memory topics) 
-        public isTeacher() returns(bool) {
+    function _createClass(string calldata name, string[] memory topics) 
+        internal isTeacher() returns(bool) {
             classes[nextClassId] = Class(nextClassId, name, topics, msg.sender);
             emit ClassCreated(msg.sender, nextClassId, name);
             nextClassId++;
             return true;
     }
 
-
-    function _isUsedWallet(address wallet) internal view returns(bool) {
-        if((teachers[wallet].wallet == address(0)) || (students[wallet].wallet == address(0))) {
-            return true;
-        }
-        return false;
+    modifier isFreshWallet(address wallet) {
+        require(teachers[wallet].wallet == address(0), "wallet is already associated with a teacher");
+        require(students[wallet].wallet == address(0), "wallet is already associated with a student");
+        require(wallet !=principal, "wallet is already associated with the principal");
+        _;
     }
-
 
     modifier isTeacher() {
         require(teachers[msg.sender].wallet != address(0), "only teachers can create a class");

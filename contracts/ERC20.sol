@@ -3,10 +3,11 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "hardhat/console.sol";
+import "./Academy.sol";
 
-contract ERC20Token is IERC20 {
+contract ERC20Token is IERC20, Academy {
 
-    string public name;
+    string public tokenName;
     string public tickerSymbol;
     uint public tokenTotalSupply;
     uint8 public decimals;
@@ -14,12 +15,12 @@ contract ERC20Token is IERC20 {
     mapping(address => mapping(address=> uint)) public allowed;
 
     constructor(
-        string memory _name,
+        string memory _tokenName,
         string memory _tickerSymbol,
         uint _tokenTotalSupply,
         uint8 _decimals
     )  {
-        name = _name;
+        tokenName = _tokenName;
         tickerSymbol = _tickerSymbol;
         tokenTotalSupply = _tokenTotalSupply;
         decimals = _decimals;
@@ -62,6 +63,19 @@ contract ERC20Token is IERC20 {
             emit Transfer(spender, recipient, amount);
             return true;
     }
+
+    function addTeacher(string calldata name, address wallet) public {
+        _addTeacher(name, wallet);
+    }
+
+    function addStudent(string calldata name, address wallet) public {
+        _addStudent(name, wallet);
+    }
+
+    function createClass(string calldata name, string[] memory topics) public {
+        _createClass(name, topics);
+    }
+
     
     modifier hasSufficientBalance(address account, uint amount) {
         require(balances[account] >= amount, "account has insufficient balance");

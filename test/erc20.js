@@ -65,8 +65,7 @@ describe("Token contract", function() {
             await expect(tokenContract.connect(addr1).transferFrom(owner.address, addr2.address, 1)).to.be.revertedWith("insufficient allowed balance");
         });
         
-
-    })
+    });
    
 
 
