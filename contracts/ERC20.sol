@@ -11,6 +11,8 @@ contract ERC20Token is IERC20, Academy {
     string public tickerSymbol;
     uint public tokenTotalSupply;
     uint8 public decimals;
+    uint constant public STARTINGAMOUNT = 5;
+
     mapping(address => uint) public balances;
     mapping(address => mapping(address=> uint)) public allowed;
 
@@ -70,13 +72,24 @@ contract ERC20Token is IERC20, Academy {
 
     function addStudent(string calldata name, address wallet) public {
         _addStudent(name, wallet);
+        balances[wallet] += STARTINGAMOUNT;
     }
 
-    function createClass(string calldata name, string[] memory topics) public {
-        _createClass(name, topics);
+    function createClass(string calldata name, uint cost) public returns(uint) {
+        uint classId = _createClass(name, cost);
+        return classId;
     }
 
-    
+    function signUpForClass(uint classId) public {
+        require(classes[classId].teacher != address(0), "class does not exist");
+        Class storage _class = classes[classId];
+        require(balances[msg.sender] >= _class.cost, "student has insufficient balance");
+        balances[msg.sender] -= _class.cost;
+        balances[_class.teacher] += _class.cost;
+        _signUpForClass(msg.sender, classId);
+    }
+
+
     modifier hasSufficientBalance(address account, uint amount) {
         require(balances[account] >= amount, "account has insufficient balance");
         _;

@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/Users/jameslim/Documents/GitHub/DOJO/contracts/Academy.sol": {
-      "lastModificationDate": 1650981857906,
-      "contentHash": "cbc350c4f6e98a64c650dd920a89a18c",
+      "lastModificationDate": 1651118475064,
+      "contentHash": "1f9620e4c935b3f1e930a39d750ad9c4",
       "sourceName": "contracts/Academy.sol",
       "solcConfig": {
         "version": "0.8.4",
@@ -37,8 +37,8 @@
       ]
     },
     "/Users/jameslim/Documents/GitHub/DOJO/contracts/ERC20.sol": {
-      "lastModificationDate": 1650980947709,
-      "contentHash": "6e723e8e679fcf88b3648b97cd07b906",
+      "lastModificationDate": 1651117141522,
+      "contentHash": "651c68c6230f902cf0cdfe56ee8083d2",
       "sourceName": "contracts/ERC20.sol",
       "solcConfig": {
         "version": "0.8.4",
