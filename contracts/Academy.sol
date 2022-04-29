@@ -24,15 +24,35 @@ contract Academy {
         address teacher;
     }
 
+    struct Consult {
+        uint id;
+        address teacher;
+        uint stake;
+        uint capacity;
+        uint currentPax;
+    }
+
+    struct ConsultAttendance {
+        bool signedUp;
+        bool attended;
+    }
+
     mapping(address => Teacher) public teachers;
     mapping(address => Student) public students;
+
     mapping(uint => Class) public classes;
     mapping(uint => address[]) public classAttendance;
 
+    mapping(uint => Consult) public consults;
+    mapping(uint => mapping(address => ConsultAttendance)) public consultAttendanceList;
+
+
     address public treasury;
     uint public nextClassId = 1;
+    uint public nextConsultId = 1;
 
     event ClassCreated(address indexed teacher, uint indexed classId, string indexed className);
+    event ConsultCreated(address indexed teacher, uint indexed consultId);
     event TeacherAdded(string indexed name, address indexed wallet);
     event StudentAdded(string indexed name, address indexed wallet);
 
@@ -40,22 +60,19 @@ contract Academy {
         treasury = msg.sender;
     }
 
-    function _addTeacher(string calldata name, address wallet) 
-        internal onlyTreasury() isFreshWallet(wallet) returns(bool) {
+    function _addTeacher(string calldata name, address wallet) internal onlyTreasury() isFreshWallet(wallet) returns(bool) {
             teachers[wallet] = Teacher(name, wallet);
             emit TeacherAdded(name, wallet);
             return true;
     }
 
-    function _addStudent(string calldata name, address wallet)
-        internal teacherOrTreasury() isFreshWallet(wallet) returns(bool) {
+    function _addStudent(string calldata name, address wallet) internal teacherOrTreasury() isFreshWallet(wallet) returns(bool) {
             students[wallet] = Student(name, wallet);
             emit StudentAdded(name, wallet);
             return true;
     }
 
-    function _createClass(string calldata name, uint cost) 
-        internal isTeacher() returns(uint) {
+    function _createClass(string calldata name, uint cost) internal isTeacher() returns(uint) {
             uint classId = nextClassId;
             classes[classId] = Class(classId, name, cost, msg.sender);
             emit ClassCreated(msg.sender, classId, name);
@@ -63,9 +80,26 @@ contract Academy {
             return classId;
     }
 
-    function _signUpForClass(address wallet, uint classId) internal isStudent() returns(bool) {
+    function _signUpForClass(address wallet, uint classId) internal returns(bool) {
         classAttendance[classId].push(wallet);
         return true;
+    }
+
+    function _createConsult(uint stake, uint capacity) internal isTeacher() returns(uint) {
+        uint consultId = nextConsultId;
+        consults[consultId] = Consult(consultId, msg.sender, stake, capacity, 0);
+        emit ConsultCreated(msg.sender, consultId);
+        consultId++;
+        return consultId;
+    }
+
+    function _signUpForConsult(address wallet, uint consultId) internal isStudent() {
+        consults[consultId].cur
+        consultAttendanceList[consultId][wallet].signedUp = true;
+    }
+
+    function _markConsultAttendance(address wallet, uint consultId) internal isTeacher() {
+        consultAttendanceList[consultId][wallet].attended = true;
     }
 
 
