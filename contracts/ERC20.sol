@@ -120,6 +120,32 @@ contract ERC20Token is IERC20, Academy {
         _markConsultAttendance(wallet, consultId);
     }
 
+    function createAssignment(uint bounty) public returns(uint) {
+        uint assignmentId = _createAssignment(bounty);
+        return assignmentId;
+    }
+
+    function approveAssignment(uint assignmentId) public onlyTreasury() {
+        Assignment storage _assignment = assignments[assignmentId];
+        require(_assignment.teacher != address(0), "assignment does not exist");
+        require(_assignment.state == AssignmentState.PENDINGAPPROVAL, "this assignment has already been approved");
+        approve(_assignment.teacher, _assignment.bounty);
+        _approveAssignment(assignmentId);
+    }
+
+    function signUpForAssignment(uint assignmentId) public {
+        _signUpForAssignment(assignmentId);
+    }
+
+    function payOutAssignment(uint assignmentId) public {
+        Assignment storage _assignment = assignments[assignmentId];
+        require(_assignment.teacher == msg.sender, "only the teacher who created this assignment can access this function");
+        require(_assignment.participant != address(0), "no participant has signed up for this assignment yet");
+        require(balances[treasury] >= _assignment.bounty, "treasury has insufficient funds");
+        transferFrom(treasury, _assignment.participant, _assignment.bounty);
+        _payOutAssignment(assignmentId);
+    }
+
 
     modifier hasSufficientBalance(address account, uint amount) {
         require(balances[account] >= amount, "account has insufficient balance");

@@ -37,6 +37,20 @@ contract Academy {
         bool attended;
     }
 
+    enum AssignmentState {
+        PENDINGAPPROVAL,
+        APPROVED,
+        COMPLETED
+    }
+
+    struct Assignment {
+        uint id;
+        address teacher;
+        uint bounty;
+        address participant;
+        AssignmentState state;
+    }
+
     mapping(address => Teacher) public teachers;
     mapping(address => Student) public students;
 
@@ -46,15 +60,18 @@ contract Academy {
     mapping(uint => Consult) public consults;
     mapping(uint => mapping(address => ConsultAttendance)) public consultAttendanceList;
 
+    mapping(uint => Assignment) public assignments;
 
     address public treasury;
     uint public nextClassId = 1;
     uint public nextConsultId = 1;
+    uint public nextAssignmentId = 1;
 
-    event ClassCreated(address indexed teacher, uint indexed classId, string indexed className);
-    event ConsultCreated(address indexed teacher, uint indexed consultId);
     event TeacherAdded(string indexed name, address indexed wallet);
     event StudentAdded(string indexed name, address indexed wallet);
+    event ClassCreated(address indexed teacher, uint indexed classId, string indexed className);
+    event ConsultCreated(address indexed teacher, uint indexed consultId);
+    event AssignmentCreated(address indexed teacher, uint indexed assignmentId);
 
     constructor() {
         treasury = msg.sender;
@@ -72,6 +89,7 @@ contract Academy {
             return true;
     }
 
+
     function _createClass(string calldata name, uint cost) internal isTeacher() returns(uint) {
             uint classId = nextClassId;
             classes[classId] = Class(classId, name, cost, msg.sender);
@@ -85,6 +103,7 @@ contract Academy {
         return true;
     }
 
+
     function _createConsult(uint stake, uint capacity) internal isTeacher() returns(uint) {
         uint consultId = nextConsultId;
         consults[consultId] = Consult(consultId, msg.sender, stake, capacity, 0);
@@ -94,15 +113,40 @@ contract Academy {
     }
 
     function _signUpForConsult(address wallet, uint consultId) internal isStudent() {
-        consults[consultId].cur
+        consults[consultId].currentPax++;
         consultAttendanceList[consultId][wallet].signedUp = true;
     }
 
     function _markConsultAttendance(address wallet, uint consultId) internal isTeacher() {
         consultAttendanceList[consultId][wallet].attended = true;
     }
+    
 
+    function _createAssignment(uint bounty) internal isTeacher() returns(uint) {
+        uint assignmentId = nextAssignmentId;
+        assignments[assignmentId] = Assignment(assignmentId, msg.sender, bounty, address(0), AssignmentState.PENDINGAPPROVAL);
+        emit AssignmentCreated(msg.sender, assignmentId);
+        nextAssignmentId++;
+        return assignmentId;
+    }
 
+    function _approveAssignment(uint assignmentId) internal onlyTreasury() {
+        assignments[assignmentId].state = AssignmentState.APPROVED;
+    }
+
+    function _signUpForAssignment(uint assignmentId) internal isStudent() {
+        Assignment storage _assignment = assignments[assignmentId];
+        require(_assignment.teacher != address(0), "assignment does not exist");
+        require(_assignment.state == AssignmentState.APPROVED, "the assignment hasn't been approved yet");
+        require(_assignment.participant == address(0), "this assignment already has a participant");
+        _assignment.participant = msg.sender;
+    }
+
+    function _payOutAssignment(uint assignmentId) internal {
+        assignments[assignmentId].state = AssignmentState.COMPLETED;
+    }
+
+    
     modifier isFreshWallet(address wallet) {
         require(teachers[wallet].wallet == address(0), "wallet is already associated with a teacher");
         require(students[wallet].wallet == address(0), "wallet is already associated with a student");
