@@ -6,9 +6,13 @@
 DOJO is a dapp that facilitates student-teacher interactions using DOJO (an ERC20 token).
 
 There are 3 entities involved: Student, Teacher & Treasury.
+
 There are 3 types of activities in this dapp: Classes, Consults & Assignments.
 
-### Tokenomics ###
+[Contract address](https://rinkeby.etherscan.io/address/0xB767Fd92084C4980F9D8d319665c1e4720A2591f) deployed on the Rinkeby testnet.
+
+
+## Tokenomics ##
 * Students' POV
   * given 5 DOJO when enrolling for the first time
   * use DOJO to pay for classes
@@ -22,7 +26,7 @@ There are 3 types of activities in this dapp: Classes, Consults & Assignments.
   * used to track how much work each teacher has been doing
 
 
-### Activities ###
+## Activities ##
 * Classes
   * teachers create classes
   * students pay DOJO to attend the classes
@@ -35,5 +39,8 @@ There are 3 types of activities in this dapp: Classes, Consults & Assignments.
   * after the treasury verifies it, students can apply to join
   * when the teacher verifies that the assignment has been completed by the student, the teacher can issue the assignment's bounty to the student (paid out from the treasury)
 
+## Unit Tests ##
 
-[Contract address](https://rinkeby.etherscan.io/address/0xB767Fd92084C4980F9D8d319665c1e4720A2591f) deployed on the Rinkeby testnet.
+<p align="center">
+    <img width="1000" alt="ss-of-terminal–output" src="https://user-images.githubusercontent.com/56946413/166108151-00735568-d251-4cc3-9f7f-e4e98f77ff39.png">
+</p>
