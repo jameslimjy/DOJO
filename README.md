@@ -1,4 +1,8 @@
 # DOJO
+<p align="center">
+    <img width="1000" alt="yeeted-dojo-img" src="https://i.pinimg.com/originals/45/ac/eb/45acebf685f5b11ff13b01df5c539cd8.jpg">
+</p>
+
 DOJO is a dapp that facilitates student-teacher interactions using DOJO (an ERC20 token).
 
 There are 3 entities involved: Student, Teacher & Treasury.
