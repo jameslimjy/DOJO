@@ -1,5 +1,5 @@
 /node_modules
 .DS_Store
 .env
-/smart-contract-stuff/artifacts
-/smart-contract-stuff/cache
+./smart-contract-stuff/artifacts
+./smart-contract-stuff/cache
