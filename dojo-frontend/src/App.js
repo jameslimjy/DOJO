@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 function App() {
 
   const [currentAccount, setCurrentAccount] = useState(null);
-  const [currentStatusm, setCurrentStatus] = useState(null);
+  const [currentStatus, setCurrentStatus] = useState(null);
   const [chain, setChain] = useState(null);
   
   // check if metamask wallet exists
@@ -51,7 +51,7 @@ function App() {
   // button for connecting wallet
   const connectWalletButton = () => {
     return (
-      <button onClick={connectWalletHandler}>
+      <button onClick={connectWalletHandler} className='cta-button connect-wallet-button'>
         Connect Wallet
       </button>
     )
@@ -74,13 +74,24 @@ function App() {
     }
   }
 
+  useEffect(() => {
+    checkWalletIsConnected();
+    checkNetwork();
+  }, [])
+
   return (
     <div className="App">
       <header className="App-header">
         <img src='dojo-pict.jpeg' width='500'></img>
           DOJO !!!
           <div>
-            {connectWalletButton()}
+            {currentAccount ? currentAccount : connectWalletButton()}
+          </div>
+          <div>
+            Current chain: {chain}
+          </div>
+          <div>
+            Current status: {currentStatus}
           </div>
       </header>
     </div>

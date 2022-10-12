@@ -28,11 +28,17 @@
   color: #61dafb;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.cta-button {
+  padding: 10px;
+  border: none;
+  border-radius: 12px;
+  min-width: 200px;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  font-family: papyrus;
+}
+
+.connect-wallet-button {
+  background: rgb(80, 137, 145);
 }
