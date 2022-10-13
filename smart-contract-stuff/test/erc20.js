@@ -41,7 +41,7 @@ describe("Token contract", function() {
         it("Should revert if sender doesn't have enough tokens", async function() {
             // try to send 1 token from addr2 to owner
             const initialOwnerBal = await tokenContract.balanceOf(owner.address);
-            await expect(tokenContract.connect(addr2).transfer(owner.address, 1)).to.be.revertedWith("account has insufficient balance");
+            await expect(tokenContract.connect(addr2).transfer(owner.address, 1)).to.be.revertedWith("insufficientBalance");
             expect(await tokenContract.balanceOf(owner.address)).to.equal(initialOwnerBal);
         });
     });
@@ -62,7 +62,7 @@ describe("Token contract", function() {
 
         it("Should revert if insufficient allowed balance", async function() {
             // addr1 try to send 1 of owner's tokens to addr2
-            await expect(tokenContract.connect(addr1).transferFrom(owner.address, addr2.address, 1)).to.be.revertedWith("insufficient allowed balance");
+            await expect(tokenContract.connect(addr1).transferFrom(owner.address, addr2.address, 1)).to.be.revertedWith("insufficientBalance");
         });
         
     });

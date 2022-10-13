@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "hardhat/console.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol"; 
 import "./Academy.sol";
 
 contract ERC20Token is IERC20, Academy {
@@ -58,7 +57,7 @@ contract ERC20Token is IERC20, Academy {
 
     function transferFrom(address spender, address recipient, uint amount)
         public override hasSufficientBalance(spender, amount) returns(bool) {
-            require(allowed[spender][msg.sender] >= amount, "insufficient allowed balance");
+            if(allowed[spender][msg.sender] < amount) { revert insufficientBalance(); }
             allowed[spender][msg.sender] -= amount;
             balances[spender] -= amount;
             balances[recipient] += amount;
@@ -72,7 +71,7 @@ contract ERC20Token is IERC20, Academy {
 
     function addStudent(string calldata name, address wallet) public {
         _addStudent(name, wallet);
-        require(balances[treasury] >= STARTINGAMOUNT, "treasury has insufficient funds");
+        if(balances[treasury] < STARTINGAMOUNT) { revert insufficientBalance(); }
         balances[wallet] += STARTINGAMOUNT;
         balances[treasury] -= STARTINGAMOUNT;
     }
@@ -84,9 +83,9 @@ contract ERC20Token is IERC20, Academy {
     }
 
     function signUpForClass(uint classId) public isStudent() {
-        require(classes[classId].teacher != address(0), "class does not exist");
+        if(classes[classId].teacher == address(0)) { revert classDontExist(); }
         Class storage _class = classes[classId];
-        require(balances[msg.sender] >= _class.cost, "student has insufficient balance");
+        if(balances[msg.sender] < _class.cost) { revert insufficientBalance(); }
         balances[msg.sender] -= _class.cost;
         balances[_class.teacher] += _class.cost;
         _signUpForClass(msg.sender, classId);
@@ -99,21 +98,21 @@ contract ERC20Token is IERC20, Academy {
     }
 
     function signUpForConsult(uint consultId) public isStudent() {
-        require(consults[consultId].teacher != address(0), "consult does not exist");
+        if(consults[consultId].teacher == address(0)) { revert consultDontExist(); }
         Consult storage _consult = consults[consultId];
-        require(balances[msg.sender] >= _consult.stake, "student has insufficient balance");
-        require(consultAttendanceList[consultId][msg.sender].signedUp == false, "student has already signed up for the consult");
-        require(consults[consultId].currentPax < consults[consultId].capacity, "this consult is already at maximum capacity");
+        if(balances[msg.sender] < _consult.stake) { revert insufficientBalance(); }
+        require(consultAttendanceList[consultId][msg.sender].signedUp == false, "already signed up");
+        require(consults[consultId].currentPax < consults[consultId].capacity, "maximum capacity");
         balances[msg.sender] -= _consult.stake;
         balances[treasury] += _consult.stake;
         _signUpForConsult(msg.sender, consultId);
     }
 
     function markConsultAttendance(address wallet, uint consultId) public {
-        require(consults[consultId].teacher != address(0), "consult does not exist");
-        require(consults[consultId].teacher == msg.sender, "only the teacher who created the consult session can access this function");
-        require(consultAttendanceList[consultId][wallet].signedUp == true, "this student did not sign up for the consult");
-        require(consultAttendanceList[consultId][wallet].attended == false, "this student's attendance has already been marked");
+        if(consults[consultId].teacher == address(0)) { revert consultDontExist(); }
+        if(consults[consultId].teacher != msg.sender) { revert noAccessRights(); }
+        require(consultAttendanceList[consultId][wallet].signedUp == true, "did not sign up");
+        require(consultAttendanceList[consultId][wallet].attended == false, "attendance already marked");
         Consult storage _consult = consults[consultId];
         balances[wallet] += _consult.stake;
         balances[treasury] -= _consult.stake;
@@ -127,8 +126,8 @@ contract ERC20Token is IERC20, Academy {
 
     function approveAssignment(uint assignmentId) public onlyTreasury() {
         Assignment storage _assignment = assignments[assignmentId];
-        require(_assignment.teacher != address(0), "assignment does not exist");
-        require(_assignment.state == AssignmentState.PENDINGAPPROVAL, "this assignment has already been approved");
+        if(_assignment.teacher == address(0)) { revert assignmentDontExist(); }
+        require(_assignment.state == AssignmentState.PENDINGAPPROVAL, "assignment already approved");
         approve(_assignment.teacher, _assignment.bounty);
         _approveAssignment(assignmentId);
     }
@@ -139,16 +138,16 @@ contract ERC20Token is IERC20, Academy {
 
     function payOutAssignment(uint assignmentId) public {
         Assignment storage _assignment = assignments[assignmentId];
-        require(_assignment.teacher == msg.sender, "only the teacher who created this assignment can access this function");
-        require(_assignment.participant != address(0), "no participant has signed up for this assignment yet");
-        require(balances[treasury] >= _assignment.bounty, "treasury has insufficient funds");
+        if(_assignment.teacher != msg.sender) { revert noAccessRights(); }
+        require(_assignment.participant != address(0), "no participant signed up");
+        if(balances[treasury] < _assignment.bounty) { revert insufficientBalance(); }
         transferFrom(treasury, _assignment.participant, _assignment.bounty);
         _payOutAssignment(assignmentId);
     }
 
 
     modifier hasSufficientBalance(address account, uint amount) {
-        require(balances[account] >= amount, "account has insufficient balance");
+        if(balances[account] < amount) { revert insufficientBalance(); }
         _;
     }
     

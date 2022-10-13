@@ -5,6 +5,12 @@ pragma solidity ^0.8.4;
 * @notice Academy is a contract that's meant to be inherited by other contracts that wants these functionalities
 */
 
+error noAccessRights();
+error classDontExist();
+error consultDontExist();
+error assignmentDontExist();
+error insufficientBalance();
+
 contract Academy {
 
     struct Teacher {
@@ -136,9 +142,9 @@ contract Academy {
 
     function _signUpForAssignment(uint assignmentId) internal isStudent() {
         Assignment storage _assignment = assignments[assignmentId];
-        require(_assignment.teacher != address(0), "assignment does not exist");
-        require(_assignment.state == AssignmentState.APPROVED, "the assignment hasn't been approved yet");
-        require(_assignment.participant == address(0), "this assignment already has a participant");
+        if(_assignment.teacher == address(0)) { revert assignmentDontExist(); }
+        require(_assignment.state == AssignmentState.APPROVED, "not approved yet");
+        require(_assignment.participant == address(0), "already taken up");
         _assignment.participant = msg.sender;
     }
 
@@ -148,29 +154,29 @@ contract Academy {
 
     
     modifier isFreshWallet(address wallet) {
-        require(teachers[wallet].wallet == address(0), "wallet is already associated with a teacher");
-        require(students[wallet].wallet == address(0), "wallet is already associated with a student");
-        require(wallet !=treasury, "wallet is already associated with the treasury");
+        require(teachers[wallet].wallet == address(0), "wallet associated with a teacher");
+        require(students[wallet].wallet == address(0), "wallet associated with a student");
+        require(wallet !=treasury, "wallet associated with the treasury");
         _;
     }
 
     modifier isTeacher() {
-        require(teachers[msg.sender].wallet != address(0), "only teachers can access this function");
+        if(teachers[msg.sender].wallet == address(0)) { revert noAccessRights(); }
         _;
     }
 
     modifier isStudent() {
-        require(students[msg.sender].wallet != address(0), "only students can access this function");
+        if(students[msg.sender].wallet == address(0)) { revert noAccessRights(); }
         _;
     }
 
     modifier onlyTreasury() {
-        require(msg.sender == treasury, "only the treasury can access this function");
+        if(msg.sender != treasury) { revert noAccessRights(); }
         _;
     }
 
     modifier teacherOrTreasury() {
-        require((msg.sender == treasury) || (teachers[msg.sender].wallet != address(0)), "only teachers or the treasury can access this function");
+        require((msg.sender == treasury) || (teachers[msg.sender].wallet != address(0)), "only teachers or the treasury can access");
         _;
     }
     

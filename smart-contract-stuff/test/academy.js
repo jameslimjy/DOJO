@@ -33,20 +33,20 @@ describe("Academy contract", function() {
 
         it("Should revert if someone else other than the treasury adds a teacher", async function() {
             await tokenContract.addTeacher("Alice", addr1.address);
-            await expect(tokenContract.connect(addr1).addTeacher("Bob", addr2.address)).to.be.revertedWith("only the treasury can access this function");
+            await expect(tokenContract.connect(addr1).addTeacher("Bob", addr2.address)).to.be.revertedWith("noAccessRights");
         });
 
         it("Should revert if the wallet has been registered before", async function() {
             // wallet associated with the treasury
-            await expect(tokenContract.addTeacher("Alice", owner.address)).to.be.revertedWith("wallet is already associated with the treasury");
+            await expect(tokenContract.addTeacher("Alice", owner.address)).to.be.revertedWith("wallet associated with the treasury");
 
             // wallet associated with another teacher
             await tokenContract.addTeacher("Alice", addr1.address);
-            await expect(tokenContract.addTeacher("Bob", addr1.address)).to.be.revertedWith("wallet is already associated with a teacher");
+            await expect(tokenContract.addTeacher("Bob", addr1.address)).to.be.revertedWith("wallet associated with a teacher");
 
             // wallet associated with a student
             await tokenContract.addStudent("Alice", addr2.address);
-            await expect(tokenContract.addTeacher("Bob", addr2.address)).to.be.revertedWith("wallet is already associated with a student");
+            await expect(tokenContract.addTeacher("Bob", addr2.address)).to.be.revertedWith("wallet associated with a student");
         });
     });
 
@@ -70,20 +70,20 @@ describe("Academy contract", function() {
         });
 
         it("Should revert if someone else other than the treasury or a teacher adds a student", async function() {
-            await expect(tokenContract.connect(addr1).addStudent("Alice", addr2.address)).to.be.revertedWith("only teachers or the treasury can access this function");
+            await expect(tokenContract.connect(addr1).addStudent("Alice", addr2.address)).to.be.revertedWith("only teachers or the treasury can access");
         });
 
         it("Should revert if the wallet has been registered before", async function() {
             // wallet associated with the treasury
-            await expect(tokenContract.addStudent("Alice", owner.address)).to.be.revertedWith("wallet is already associated with the treasury");
+            await expect(tokenContract.addStudent("Alice", owner.address)).to.be.revertedWith("wallet associated with the treasury");
 
             // wallet associated with another teacher
             await tokenContract.addTeacher("Alice", addr1.address);
-            await expect(tokenContract.addStudent("Bob", addr1.address)).to.be.revertedWith("wallet is already associated with a teacher");
+            await expect(tokenContract.addStudent("Bob", addr1.address)).to.be.revertedWith("wallet associated with a teacher");
 
             // wallet associated with a student
             await tokenContract.addStudent("Alice", addr2.address);
-            await expect(tokenContract.addStudent("Bob", addr2.address)).to.be.revertedWith("wallet is already associated with a student");
+            await expect(tokenContract.addStudent("Bob", addr2.address)).to.be.revertedWith("wallet associated with a student");
         });
     });
 
@@ -95,13 +95,13 @@ describe("Academy contract", function() {
                 await tokenContract.addTeacher("Alice", addr1.address);
     
                 // teacher creating a class
-                const classId = await tokenContract.connect(addr1).createClass("Tokenomics 101", 2);
+                await tokenContract.connect(addr1).createClass("Tokenomics 101", 2);
                 const _class = await tokenContract.classes(1); // hardcoded this because keep getting error when using returned uint value but whyyy
                 expect(_class[1]).to.equal("Tokenomics 101");
             });
 
             it("Should revert if not created by a teacher", async function() {
-                await expect(tokenContract.createClass("Tokenomics 101", 2)).to.be.revertedWith("only teachers can access this function");
+                await expect(tokenContract.createClass("Tokenomics 101", 2)).to.be.revertedWith("noAccessRights");
             });
 
         });
@@ -111,7 +111,7 @@ describe("Academy contract", function() {
                 // add teacher + create class
                 await tokenContract.addTeacher("Alice", addr1.address);
                 const initialTeacherBal = await tokenContract.balanceOf(addr1.address);
-                const classId = await tokenContract.connect(addr1).createClass("Tokenomics 101", 2);
+                await tokenContract.connect(addr1).createClass("Tokenomics 101", 2);
     
                 // add student
                 await tokenContract.connect(addr1).addStudent("Bob", addr2.address);
@@ -132,13 +132,13 @@ describe("Academy contract", function() {
             it("Should revert if student has insufficient balance", async function() {
                 // add teacher + create class
                 await tokenContract.addTeacher("Alice", addr1.address);
-                const classId = await tokenContract.connect(addr1).createClass("Tokenomics 101", 6);
+                await tokenContract.connect(addr1).createClass("Tokenomics 101", 6);
     
                 // add student
                 await tokenContract.connect(addr1).addStudent("Bob", addr2.address);
      
                 // student attempts to sign up for a class
-                await expect(tokenContract.connect(addr2).signUpForClass(1)).to.be.revertedWith("student has insufficient balance");
+                await expect(tokenContract.connect(addr2).signUpForClass(1)).to.be.revertedWith("insufficientBalance");
             });
     
             it("Should revert if student trying to join a class that does not exist", async function() {
@@ -146,17 +146,16 @@ describe("Academy contract", function() {
                 await tokenContract.addStudent("Bob", addr1.address);
     
                 // student attempts to sign up for a class
-                await expect(tokenContract.connect(addr1).signUpForClass(1)).to.be.revertedWith("class does not exist");
-     
+                await expect(tokenContract.connect(addr1).signUpForClass(1)).to.be.revertedWith("classDontExist");
             });
     
             it("Should revert if the wallet trying to join the class is not a student", async function() {
                 // add teacher + create class
                 await tokenContract.addTeacher("Alice", addr1.address);
-                const classId = await tokenContract.connect(addr1).createClass("Tokenomics 101", 2);
+                await tokenContract.connect(addr1).createClass("Tokenomics 101", 2);
     
                 // non-student attempts to sign up for a class
-                await expect(tokenContract.connect(addr2).signUpForClass(1)).to.be.revertedWith("only students can access this function");
+                await expect(tokenContract.connect(addr2).signUpForClass(1)).to.be.revertedWith("noAccessRights");
             });
         });
     });
@@ -173,7 +172,7 @@ describe("Academy contract", function() {
             });
     
             it("Should revert if a non-teacher created a consult", async function() {
-                await expect(tokenContract.createConsult(2,5)).to.be.revertedWith("only teachers can access this function");
+                await expect(tokenContract.createConsult(2,5)).to.be.revertedWith("noAccessRights");
             });
         });
 
@@ -202,19 +201,19 @@ describe("Academy contract", function() {
             it("Should revert if a non-student trys to join a consult", async function() {
                 await tokenContract.addTeacher("Alice", addr1.address);
                 await tokenContract.connect(addr1).createConsult(2, 5);
-                await expect(tokenContract.connect(addr2).signUpForConsult(1)).to.be.revertedWith("only students can access this function");
+                await expect(tokenContract.connect(addr2).signUpForConsult(1)).to.be.revertedWith("noAccessRights");
             });
     
             it("Should revert if a student trys to join a consult that does not exist", async function() {
                 await tokenContract.addStudent("Alice", addr1.address);
-                await expect(tokenContract.connect(addr1).signUpForConsult(1)).to.be.revertedWith("consult does not exist");
+                await expect(tokenContract.connect(addr1).signUpForConsult(1)).to.be.revertedWith("consultDontExist");
             });
     
             it("Should revert if the student has insufficient balance", async function() {
                 await tokenContract.addTeacher("Alice", addr1.address);
                 await tokenContract.connect(addr1).createConsult(6, 5);
                 await tokenContract.addStudent("Bob", addr2.address);
-                await expect(tokenContract.connect(addr2).signUpForConsult(1)).to.be.revertedWith("student has insufficient balance");
+                await expect(tokenContract.connect(addr2).signUpForConsult(1)).to.be.revertedWith("insufficientBalance");
             });
     
             it("Should revert if the student has already signed up for the consult", async function() {
@@ -222,7 +221,7 @@ describe("Academy contract", function() {
                 await tokenContract.connect(addr1).createConsult(2, 5);
                 await tokenContract.addStudent("Bob", addr2.address);
                 await tokenContract.connect(addr2).signUpForConsult(1);
-                await expect(tokenContract.connect(addr2).signUpForConsult(1)).to.be.revertedWith("student has already signed up for the consult");
+                await expect(tokenContract.connect(addr2).signUpForConsult(1)).to.be.revertedWith("already signed up");
             });
     
             it("Should revert if the consult is already at maximum capacity", async function() {
@@ -234,7 +233,7 @@ describe("Academy contract", function() {
                 await tokenContract.connect(addr3).signUpForConsult(1);
     
                 await tokenContract.addStudent("Dom", addr4.address);
-                await expect(tokenContract.connect(addr4).signUpForConsult(1)).to.be.revertedWith("this consult is already at maximum capacity");
+                await expect(tokenContract.connect(addr4).signUpForConsult(1)).to.be.revertedWith("maximum capacity");
             });
         });
 
@@ -261,7 +260,7 @@ describe("Academy contract", function() {
 
             it("Should revert if consult does not exist", async function() {
                 await tokenContract.addStudent("Alice", addr1.address);
-                await expect(tokenContract.connect(addr1).signUpForConsult(1)).to.be.revertedWith("consult does not exist");
+                await expect(tokenContract.connect(addr1).signUpForConsult(1)).to.be.revertedWith("consultDontExist");
             });
 
             it("Should revert if someone else other than the teacher who created the consult attempts to mark attendance", async function() {
@@ -271,7 +270,7 @@ describe("Academy contract", function() {
                 await tokenContract.connect(addr2).signUpForConsult(1);
 
                 await tokenContract.addTeacher("Carl", addr3.address);
-                await expect(tokenContract.connect(addr3).markConsultAttendance(addr2.address, 1)).to.be.revertedWith("only the teacher who created the consult session can access this function");
+                await expect(tokenContract.connect(addr3).markConsultAttendance(addr2.address, 1)).to.be.revertedWith("noAccessRights");
             });
 
             it("Should revert if the student did not sign up for the consult", async function() {
@@ -280,7 +279,7 @@ describe("Academy contract", function() {
                 await tokenContract.addStudent("Bob", addr2.address);
                 await tokenContract.connect(addr2).signUpForConsult(1);
                 await tokenContract.addStudent("Carl", addr3.address);
-                await expect(tokenContract.connect(addr1).markConsultAttendance(addr3.address, 1)).to.be.revertedWith("this student did not sign up for the consult");
+                await expect(tokenContract.connect(addr1).markConsultAttendance(addr3.address, 1)).to.be.revertedWith("did not sign up");
             });
 
             it("Should revert if the student's attendance has already been marked", async function() {
@@ -289,7 +288,7 @@ describe("Academy contract", function() {
                 await tokenContract.addStudent("Bob", addr2.address);
                 await tokenContract.connect(addr2).signUpForConsult(1);
                 await tokenContract.connect(addr1).markConsultAttendance(addr2.address, 1);
-                await expect(tokenContract.connect(addr1).markConsultAttendance(addr2.address, 1)).to.be.revertedWith("this student's attendance has already been marked");
+                await expect(tokenContract.connect(addr1).markConsultAttendance(addr2.address, 1)).to.be.revertedWith("attendance already marked");
             });
         });
     });
@@ -305,7 +304,7 @@ describe("Academy contract", function() {
             });
 
             it("Should revert if a non-teacher attempts to create an assignment", async function() {
-                await expect(tokenContract.createAssignment(4)).to.be.revertedWith("only teachers can access this function");
+                await expect(tokenContract.createAssignment(4)).to.be.revertedWith("noAccessRights");
             });
         });
 
@@ -322,18 +321,18 @@ describe("Academy contract", function() {
             it("Should revert if msg.sender is not the treasury", async function() {
                 await tokenContract.addTeacher("Alice", addr1.address);
                 await tokenContract.connect(addr1).createAssignment(4);
-                await expect(tokenContract.connect(addr1).approveAssignment(1)).to.be.revertedWith("only the treasury can access this function");
+                await expect(tokenContract.connect(addr1).approveAssignment(1)).to.be.revertedWith("noAccessRights");
             });
 
             it("Should revert if assignment has already been approved", async function() {
                 await tokenContract.addTeacher("Alice", addr1.address);
                 await tokenContract.connect(addr1).createAssignment(4);
                 await tokenContract.approveAssignment(1);
-                await expect(tokenContract.approveAssignment(1)).to.be.revertedWith("this assignment has already been approved");
+                await expect(tokenContract.approveAssignment(1)).to.be.revertedWith("assignment already approved");
             });
 
             it("Should revert if assignment does not exist", async function() {
-                await expect(tokenContract.approveAssignment(1)).to.be.revertedWith("assignment does not exist");
+                await expect(tokenContract.approveAssignment(1)).to.be.revertedWith("assignmentDontExist");
             });
         });
 
@@ -354,19 +353,19 @@ describe("Academy contract", function() {
                 await tokenContract.addTeacher("Alice", addr1.address);
                 await tokenContract.connect(addr1).createAssignment(4);
                 await tokenContract.approveAssignment(1);
-                await expect(tokenContract.connect(addr2).signUpForAssignment(1)).to.be.revertedWith("only students can access this function");
+                await expect(tokenContract.connect(addr2).signUpForAssignment(1)).to.be.revertedWith("noAccessRights");
             });
 
             it("Should revert if assignment does not exist", async function() {
                 await tokenContract.addStudent("Bob", addr2.address);
-                await expect(tokenContract.connect(addr2).signUpForAssignment(1)).to.be.revertedWith("assignment does not exist");
+                await expect(tokenContract.connect(addr2).signUpForAssignment(1)).to.be.revertedWith("assignmentDontExist");
             });
 
             it("Should revert if the assignment has not been approved yet", async function() {
                 await tokenContract.addTeacher("Alice", addr1.address);
                 await tokenContract.addStudent("Bob", addr2.address);
                 await tokenContract.connect(addr1).createAssignment(4);
-                await expect(tokenContract.connect(addr2).signUpForAssignment(1)).to.be.revertedWith("the assignment hasn't been approved yet");
+                await expect(tokenContract.connect(addr2).signUpForAssignment(1)).to.be.revertedWith("not approved yet");
             });
 
             it("Should revert if the assignment already has a participant", async function() {
@@ -376,7 +375,7 @@ describe("Academy contract", function() {
                 await tokenContract.connect(addr1).createAssignment(4);
                 await tokenContract.approveAssignment(1);
                 await tokenContract.connect(addr2).signUpForAssignment(1);
-                await expect(tokenContract.connect(addr3).signUpForAssignment(1)).to.be.revertedWith("this assignment already has a participant");
+                await expect(tokenContract.connect(addr3).signUpForAssignment(1)).to.be.revertedWith("already taken up");
             });
         });
 
@@ -412,14 +411,14 @@ describe("Academy contract", function() {
                 await tokenContract.connect(addr1).createAssignment(4);
                 await tokenContract.approveAssignment(1);
                 await tokenContract.connect(addr2).signUpForAssignment(1);
-                await expect(tokenContract.connect(addr3).payOutAssignment(1)).to.be.revertedWith("only the teacher who created this assignment can access this function");
+                await expect(tokenContract.connect(addr3).payOutAssignment(1)).to.be.revertedWith("noAccessRights");
             });
 
             it("Should revert if no participant has signed up for the assignment yet", async function() {
                 await tokenContract.addTeacher("Alice", addr1.address);
                 await tokenContract.connect(addr1).createAssignment(4);
                 await tokenContract.approveAssignment(1);
-                await expect(tokenContract.connect(addr1).payOutAssignment(1)).to.be.revertedWith("no participant has signed up for this assignment yet");
+                await expect(tokenContract.connect(addr1).payOutAssignment(1)).to.be.revertedWith("no participant signed up");
             });
 
             it("Should revert if the treasury has insufficient funds", async function() {
@@ -431,7 +430,8 @@ describe("Academy contract", function() {
                 
                 const treasuryBal = await tokenContract.balanceOf(owner.address);
                 await tokenContract.connect(owner).transfer(addr2.address, treasuryBal);
-                // await expect(tokenContract.connect(addr1).payOutAssignment(1)).to.be.revertedWith("treasury has insufficient funds"); Error: insufficient funds for intrinsic transaction cost
+
+                await expect(tokenContract.connect(addr1).payOutAssignment(1)).to.be.revertedWith("insufficientBalance"); 
             });
         });
     })
