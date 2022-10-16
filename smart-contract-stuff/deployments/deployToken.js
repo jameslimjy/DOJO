@@ -5,14 +5,14 @@ const main = async () => {
     // ether's abstraction of the contract
     const tokenFactory = await ethers.getContractFactory("ERC20Token");
 
-    // deployer of the contract
-    const [deployer] = await ethers.getSigners();
-    console.log(`address deploying the contract --> ${deployer.address}`);
+    // get Signers
+    const [treasury, teacher1, teacher2, student1, student2, student3, student4, student5] = await ethers.getSigners();
+    console.log(`Treasury address --> ${treasury.address}`);
 
     // deploys the contract
-    const contract = await tokenFactory.deploy("DOJO Token", "DOJO", 10000, 2);
+    const contract = await tokenFactory.connect(treasury).deploy("DOJO Token", "DOJO", 10000, 2);
+    console.log(`Token contract address --> ${contract.address}`);
 
-    console.log(`Token Contract address --> ${contract.address}`);
 }
 
 main()

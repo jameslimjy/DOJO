@@ -1,12 +1,18 @@
 import './App.css';
 import React, { useState, useEffect } from 'react';
+import contract from "./contracts/ERC20Token.json";
 import { ethers } from 'ethers';
+
+const abi = contract.abi;
 
 function App() {
 
   const [currentAccount, setCurrentAccount] = useState(null);
   const [currentStatusm, setCurrentStatus] = useState(null);
   const [chain, setChain] = useState(null);
+  const [currentSCAddress, setSCAddress] = useState(null);
+
+  console.log(currentAccount);
   
   // check if metamask wallet exists
   const checkWalletIsConnected = async () => {
@@ -50,11 +56,39 @@ function App() {
 
   // button for connecting wallet
   const connectWalletButton = () => {
-    return (
-      <button onClick={connectWalletHandler}>
-        Connect Wallet
-      </button>
-    )
+    if (currentAccount == null) {
+      console.log("currentAccount is undefined");
+      return (
+        <button onClick={connectWalletHandler}>
+          Connect Wallet
+        </button>
+      )
+    } else {
+      console.log("current account is already defined: ", currentAccount);
+      return (
+        currentAccount
+      )
+    }
+  }
+
+  // button to connect smart contract
+  const connectSCButton = () => {
+    if (currentSCAddress == null) {
+      console.log("currentSCAddress is udnefined");
+      return (
+        <form>
+            <input 
+              type="text" 
+              placeholder="input SC address" 
+              onChange={(e) => setSCAddress(e.target.value)}></input>
+        </form>
+      )
+    } else {
+      console.log("current SC address is already defined: ", currentSCAddress);
+      return (
+        currentSCAddress
+      )
+    }
   }
 
   const checkNetwork = async () => {
@@ -80,7 +114,10 @@ function App() {
         <img src='dojo-pict.jpeg' width='500'></img>
           DOJO !!!
           <div>
-            {connectWalletButton()}
+            { connectWalletButton() }
+          </div>
+          <div>
+            { connectSCButton() }
           </div>
       </header>
     </div>
