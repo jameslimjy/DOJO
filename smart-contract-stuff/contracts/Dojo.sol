@@ -103,6 +103,18 @@ contract Dojo is AccessControl, ERC20 {
     }
 
     /**
+     *
+     * @notice To retrieve the information of a class
+     * @param classId The classId of the class' info to return
+     */
+    function getClassInfo(
+        uint256 classId
+    ) external view classExists(classId) returns (uint256, string memory, uint8, address, address[] memory) {
+        Class memory _class = classes[classId];
+        return (_class.classId, _class.name, _class.cost, _class.teacher, _class.students);
+    }
+
+    /**
      * @notice For the principal to add a new teacher
      * @param name The teacher's name
      * @param wallet The teacher's wallet
