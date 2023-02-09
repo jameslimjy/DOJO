@@ -9,6 +9,11 @@ const classes = [
     ["Psychology 101", 1],
     ["Machine learning with Python", 3],
 ]
+const assignments = [
+    ["Write research paper on drones", 15],
+    ["TA for a semester", 20],
+    ["RA for a data science project", 25],
+]
 
 const main = async () => {
     // get signers
@@ -33,6 +38,7 @@ const main = async () => {
     await dojo.connect(principal).addStudent(studentNames[2], student3.address)
     await dojo.connect(principal).addStudent(studentNames[3], student4.address)
 
+    // ----- CLASSES ----- //
     // create classes
     await dojo.connect(teacher1).createClass(classes[0][0], classes[0][1])
     await dojo.connect(teacher1).createClass(classes[1][0], classes[1][1])
@@ -45,6 +51,36 @@ const main = async () => {
     await dojo.connect(student2).signUpForClass(2)
     await dojo.connect(student3).signUpForClass(2)
     await dojo.connect(student4).signUpForClass(2)
+
+    // ----- CONSULTS ----- //
+    // create consults
+    await dojo.connect(teacher1).createConsult(1, 3)
+    await dojo.connect(teacher2).createConsult(2, 2)
+
+    // sign up for consults
+    await dojo.connect(student1).signUpForConsult(0)
+    await dojo.connect(student4).signUpForConsult(0)
+    await dojo.connect(student2).signUpForConsult(1)
+
+    // mark consult attendance
+    await dojo.connect(teacher1).markConsultAttendance(0, student1.address)
+
+    // ----- ASSIGNMENTS ----- //
+    // create assignments
+    await dojo.connect(teacher1).createAssignment(assignments[0][1], assignments[0][0])
+    await dojo.connect(teacher1).createAssignment(assignments[1][1], assignments[1][0])
+    await dojo.connect(teacher2).createAssignment(assignments[2][1], assignments[2][0])
+
+    // approve assignments
+    await dojo.connect(principal).approveAssignment(0)
+    await dojo.connect(principal).approveAssignment(1)
+
+    // sign up for assignments
+    await dojo.connect(student2).signUpForAssignment(0)
+    await dojo.connect(student3).signUpForAssignment(1)
+
+    // pay out assignments
+    await dojo.connect(teacher1).payOutAssignment(0)
 }
 
 main()

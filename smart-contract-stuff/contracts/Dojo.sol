@@ -115,6 +115,42 @@ contract Dojo is AccessControl, ERC20 {
     }
 
     /**
+     *
+     * @notice To retrieve the information of a consult
+     * @param consultId The consultId of the consult's info to return
+     */
+    function getConsultInfo(
+        uint256 consultId
+    ) external view consultExists(consultId) returns (uint256, address, uint8, uint8, address[] memory) {
+        Consult memory _consult = consults[consultId];
+        return (_consult.consultId, _consult.teacher, _consult.stake, _consult.capacity, _consult.studentsSignedUp);
+    }
+
+    /**
+     *
+     * @notice To retrieve the information of an assignment
+     * @param assignmentId The assignmentId of the assignment's info to return
+     */
+    function getAssignmentInfo(
+        uint256 assignmentId
+    )
+        external
+        view
+        assignmentExists(assignmentId)
+        returns (uint256, string memory, address, uint8, address, AssignmentApprovalState)
+    {
+        Assignment memory _assignment = assignments[assignmentId];
+        return (
+            _assignment.assignmentId,
+            _assignment.description,
+            _assignment.teacher,
+            _assignment.bounty,
+            _assignment.participant,
+            _assignment.state
+        );
+    }
+
+    /**
      * @notice For the principal to add a new teacher
      * @param name The teacher's name
      * @param wallet The teacher's wallet
