@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300&display=swap');
+
+.home-page{
+    /* display: flex;
+    flex-direction: column; */
+}
+
+.top-section {
+    display: flex;
+    /* background-color: lightblue; */
+    align-items: center;
+    justify-content: center;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.banner-pict {
+    width: 700px;
+}
+
+.top-middle-section {
+    display:flex;
+    justify-content: center;
+    font-family: Chakra;
+    color: white;
+    font-size: 40px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.middle-section {
+    /* background-color: lightpink; */
+    display: flex;
+    justify-content: center;
+    padding-bottom: 30px;
+}
+
+.class-button, .consult-button, .assignment-button {
+    display: flex;
+    align-self: center;
+    height: 220px;
+    width: 220px;
+    border-style: solid;
+    border-width: 2px;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: inline-block;
+    border-radius: 15px;
+    font-family: Chakra;
+    color: white;
+    font-size: 23px;
+    line-height: 23px;
+    transition: all 235ms ease-in-out;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+}
+
+.class-button {
+    background-color: rgba(100,140,101,255);
+}
+
+.consult-button {
+    margin-left: 20px;
+    margin-right: 20px;
+    background-color: rgba(68,147,172,255);
+}
+
+.button-text {
+    padding-top: 0px;
+}
+
+.assignment-button {
+    background-color: rgba(117, 67, 79, 255);
+}
+
+.class-button:hover, .consult-button:hover, .assignment-button:hover {
+    box-shadow: rgba(0, 0, 0, .3) 2px 8px 8px -5px;
+    transform: translate3d(0, 2px, 0);
+  }
+  
+.class-button:focus, .consult-button:focus, .assignment-button:focus {
+    box-shadow: rgba(0, 0, 0, .3) 2px 8px 4px -6px;
+}
+
+.button-pict {
+    width: 160px;
+    object-fit: cover;
+    object-position: center;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+.bottom-section {
+    /* background-color: lightblue; */
+    display: flex;
+    justify-content: left;
+    font-family: Chakra;
+    color: white;
+    font-size: 25px;
+    padding-left: 70px;
+}
+
