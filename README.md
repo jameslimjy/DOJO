@@ -30,8 +30,6 @@ Terminal 3 - Start React Frontend
 npm start
 ```
 
-If you encounter this error `received invalid block tag` in the local hardhat network terminal, change to a different network in MetaMask and change back to Hardhat Network, this will reset the cache in MetaMask. Read more [here](https://ethereum.stackexchange.com/questions/109625/received-invalid-block-tag-87-latest-block-number-is-0). Or, if that doesn't work, then reset your activity tab in MetaMask.
-
 ## Tokenomics
 
 - Students' POV
