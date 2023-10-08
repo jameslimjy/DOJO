@@ -63,17 +63,36 @@ const TeacherMgmtPage = () => {
       await nftContract.addTeacher(teacherToAddName, teacherToAddAddress);
       toast("Added teacher!");
 
-      // listen for event and update teachers
+      // clear input fields
+      setTeacherToAddAddress("");
+      setTeacherToAddName("");
     } catch (e) {
       console.log(e);
     }
   };
 
   useEffect(() => {
+    const { ethereum } = window;
+    const provider = new ethers.providers.Web3Provider(ethereum);
+    const signer = provider.getSigner();
+    const nftContract = new ethers.Contract(contractAddress, abi, signer);
+
     if (!hasFetchedTeacherInfo) {
       getTeachers();
       setHasFetchedTeacherInfo(true);
     }
+
+    // listen for TeacherCreated event
+    const onTeacherAdded = (name, wallet) => {
+      getTeachers();
+    };
+
+    nftContract.on("TeacherCreated", onTeacherAdded);
+
+    // clean up listener when the component is unmounted
+    return () => {
+      nftContract.off("TeacherCreated", onTeacherAdded);
+    };
   }, [teachersInfo]);
 
   return (

@@ -77,8 +77,10 @@ contract Dojo is AccessControl, ERC20 {
         AssignmentApprovalState state;
     }
 
-    mapping(address => Teacher) public teachers;
     address[] public teacherAddresses;
+    address[] public studentAddresses;
+
+    mapping(address => Teacher) public teachers;
     mapping(address => Student) public students;
     mapping(uint256 => Class) public classes;
     mapping(uint256 => Consult) public consults;
@@ -156,11 +158,17 @@ contract Dojo is AccessControl, ERC20 {
     }
 
     /**
-     *
      * @notice To retrieve a list of teacher addresses
      */
     function getTeachers() external view returns (address[] memory) {
         return teacherAddresses;
+    }
+
+    /**
+     * @notice To retrieve a list of student addresses
+     */
+    function getStudents() external view returns (address[] memory) {
+        return studentAddresses;
     }
 
     /**
@@ -200,6 +208,7 @@ contract Dojo is AccessControl, ERC20 {
         Student storage _student = students[wallet];
         _student.name = name;
         _student.wallet = wallet;
+        studentAddresses.push(wallet);
         emit StudentCreated(name, wallet);
         numStudents++;
     }
