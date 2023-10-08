@@ -18,6 +18,7 @@ function App() {
         <img src="dojo-pict.jpeg" width="500"></img>
         DOJO !!!
       </header>
+      <body>hi</body>
     </div>
   );
 }

@@ -8,6 +8,9 @@ import HomePage from "./pages/HomePage";
 import ClassPage from "./pages/ClassPage";
 import ConsultPage from "./pages/ConsultPage";
 import AssignmentPage from "./pages/AssignmentPage";
+import TeacherMgmtPage from "./pages/TeacherMgmtPage";
+import StudentMgmtPage from "./pages/StudentMgmtPage";
+import TreasuryMgmtPage from "./pages/TreasuryMgmtPage";
 
 const router = createBrowserRouter([
   {
@@ -25,6 +28,18 @@ const router = createBrowserRouter([
   {
     path: "/assignment",
     element: <AssignmentPage />,
+  },
+  {
+    path: "/teachermgmt",
+    element: <TeacherMgmtPage />,
+  },
+  {
+    path: "/studentmgmt",
+    element: <StudentMgmtPage />,
+  },
+  {
+    path: "/treasurymgmt",
+    element: <TreasuryMgmtPage />,
   },
 ]);
 

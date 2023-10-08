@@ -78,6 +78,7 @@ contract Dojo is AccessControl, ERC20 {
     }
 
     mapping(address => Teacher) public teachers;
+    address[] public teacherAddresses;
     mapping(address => Student) public students;
     mapping(uint256 => Class) public classes;
     mapping(uint256 => Consult) public consults;
@@ -107,9 +108,12 @@ contract Dojo is AccessControl, ERC20 {
      * @notice To retrieve the information of a class
      * @param classId The classId of the class' info to return
      */
-    function getClassInfo(
-        uint256 classId
-    ) external view classExists(classId) returns (uint256, string memory, uint8, address, address[] memory) {
+    function getClassInfo(uint256 classId)
+        external
+        view
+        classExists(classId)
+        returns (uint256, string memory, uint8, address, address[] memory)
+    {
         Class memory _class = classes[classId];
         return (_class.classId, _class.name, _class.cost, _class.teacher, _class.students);
     }
@@ -119,9 +123,12 @@ contract Dojo is AccessControl, ERC20 {
      * @notice To retrieve the information of a consult
      * @param consultId The consultId of the consult's info to return
      */
-    function getConsultInfo(
-        uint256 consultId
-    ) external view consultExists(consultId) returns (uint256, address, uint8, uint8, address[] memory) {
+    function getConsultInfo(uint256 consultId)
+        external
+        view
+        consultExists(consultId)
+        returns (uint256, address, uint8, uint8, address[] memory)
+    {
         Consult memory _consult = consults[consultId];
         return (_consult.consultId, _consult.teacher, _consult.stake, _consult.capacity, _consult.studentsSignedUp);
     }
@@ -131,9 +138,7 @@ contract Dojo is AccessControl, ERC20 {
      * @notice To retrieve the information of an assignment
      * @param assignmentId The assignmentId of the assignment's info to return
      */
-    function getAssignmentInfo(
-        uint256 assignmentId
-    )
+    function getAssignmentInfo(uint256 assignmentId)
         external
         view
         assignmentExists(assignmentId)
@@ -151,18 +156,29 @@ contract Dojo is AccessControl, ERC20 {
     }
 
     /**
+     *
+     * @notice To retrieve a list of teacher addresses
+     */
+    function getTeachers() external view returns (address[] memory) {
+        return teacherAddresses;
+    }
+
+    /**
      * @notice For the principal to add a new teacher
      * @param name The teacher's name
      * @param wallet The teacher's wallet
      */
-    function addTeacher(
-        string calldata name,
-        address wallet
-    ) external onlyPrincipal isFreshWallet(wallet) notEmptyString(name) {
+    function addTeacher(string calldata name, address wallet)
+        external
+        onlyPrincipal
+        isFreshWallet(wallet)
+        notEmptyString(name)
+    {
         _setupRole(TEACHER_ROLE, wallet);
         Teacher storage _teacher = teachers[wallet];
         _teacher.name = name;
         _teacher.wallet = wallet;
+        teacherAddresses.push(wallet);
         emit TeacherCreated(name, wallet);
         numTeachers++;
     }
@@ -172,10 +188,12 @@ contract Dojo is AccessControl, ERC20 {
      * @param name The student's name
      * @param wallet The student's wallet
      */
-    function addStudent(
-        string calldata name,
-        address wallet
-    ) external onlyPrincipal isFreshWallet(wallet) notEmptyString(name) {
+    function addStudent(string calldata name, address wallet)
+        external
+        onlyPrincipal
+        isFreshWallet(wallet)
+        notEmptyString(name)
+    {
         require(balanceOf(address(this)) >= STUDENT_STARTING_AMOUNT, "Treasury has insufficient balance");
         _transfer(address(this), wallet, STUDENT_STARTING_AMOUNT);
         _setupRole(STUDENT_ROLE, wallet);
@@ -251,10 +269,11 @@ contract Dojo is AccessControl, ERC20 {
      * @param consultId The consultId of the consulation
      * @param studentAddr The wallet address of the student who's attendance is to be marked
      */
-    function markConsultAttendance(
-        uint256 consultId,
-        address studentAddr
-    ) external onlyTeacher consultExists(consultId) {
+    function markConsultAttendance(uint256 consultId, address studentAddr)
+        external
+        onlyTeacher
+        consultExists(consultId)
+    {
         Student storage _student = students[studentAddr];
         require(_student.consults[consultId] == ConsultAttendance.SIGNED_UP, "Student did not sign up for consult");
         Consult storage _consult = consults[consultId];
@@ -269,18 +288,14 @@ contract Dojo is AccessControl, ERC20 {
      * @param bounty The amount of DOJO tokens to be paid out to the student on completion of the assignment
      * @param description A 1-liner description of the assignment
      */
-    function createAssignment(
-        uint8 bounty,
-        string calldata description
-    ) external onlyTeacher notEmptyString(description) {
+    function createAssignment(uint8 bounty, string calldata description)
+        external
+        onlyTeacher
+        notEmptyString(description)
+    {
         uint256 assignmentId = nextAssignmentId;
         assignments[assignmentId] = Assignment(
-            assignmentId,
-            description,
-            msg.sender,
-            bounty,
-            address(0),
-            AssignmentApprovalState.PENDING_APPROVAL
+            assignmentId, description, msg.sender, bounty, address(0), AssignmentApprovalState.PENDING_APPROVAL
         );
         nextAssignmentId++;
         emit AssignmentCreated(assignmentId, msg.sender, bounty);

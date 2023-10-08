@@ -5,6 +5,9 @@ import dojoPict from "../images/dojo-pict.jpeg";
 import classPict from "../images/class.png";
 import consultPict from "../images/consult.png";
 import assignmentPict from "../images/assignment.png";
+import studentMgmtPict from "../images/student.png";
+import teacherMgmtPict from "../images/teacher.png";
+import treasuryMgmtPict from "../images/treasury.png";
 
 const HomePage = () => {
   return (
@@ -33,6 +36,27 @@ const HomePage = () => {
           <button className="assignment-button">
             <img className="button-pict" src={assignmentPict} />
             Assignment
+          </button>
+        </Link>
+      </div>
+
+      <div className="middle-section">
+        <Link to="/teachermgmt">
+          <button className="class-button">
+            <img className="button-pict" src={teacherMgmtPict} />
+            Teacher Mgmt
+          </button>
+        </Link>
+        <Link to="/studentmgmt">
+          <button className="consult-button">
+            <img className="button-pict" src={studentMgmtPict} />
+            Student Mgmt
+          </button>
+        </Link>
+        <Link to="/treasurymgmt">
+          <button className="assignment-button">
+            <img className="button-pict" src={treasuryMgmtPict} />
+            Treasury Mgmt
           </button>
         </Link>
       </div>
