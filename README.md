@@ -9,7 +9,21 @@ There are 3 entities involved: Student, Teacher & Treasury.
 
 There are 3 types of activities in this dapp: Classes, Consults & Assignments.
 
-[Contract address](https://rinkeby.etherscan.io/address/0xB767Fd92084C4980F9D8d319665c1e4720A2591f) deployed on the Rinkeby testnet.
+## Quick start:
+Terminal 1 - Start Local Hardhat Network
+```
+npx hardhat node
+```
+
+Terminal 2 - Deploy SC
+```
+npx hardhat run deployments/deploy.js --network localhost
+```
+
+Terminal 3 - Start React Frontend
+```
+npm start
+```
 
 
 ## Tokenomics ##
